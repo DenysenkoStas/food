@@ -29,6 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
     hideTabContent();
     showTabContent();
 
+    // переключение табов
     tabsParent.addEventListener('click', (event) => {
         const target = event.target;
 

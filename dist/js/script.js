@@ -120,7 +120,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   hideTabContent();
-  showTabContent();
+  showTabContent(); // переключение табов
+
   tabsParent.addEventListener('click', event => {
     const target = event.target;
 
