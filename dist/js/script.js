@@ -188,6 +188,51 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   setClock('.timer', deadline);
+  /* Modal */
+
+  const modalTrigger = document.querySelectorAll('[data-modal]'),
+        modal = document.querySelector('.modal'),
+        closeCloseBtn = modal.querySelector('[data-close]');
+
+  function toogleModal() {
+    modal.classList.toggle('show');
+    document.body.toggle('overflow-hidden');
+  } // открытие попапа
+
+
+  modalTrigger.forEach(btn => {
+    btn.addEventListener('click', toogleModal);
+  }); // modalTrigger.forEach(btn => {
+  //     btn.addEventListener('click', () => {
+  //         // modal.classList.add('show');
+  //         // modal.classList.remove('hide');
+  //         modal.classList.toggle('show');
+  //         document.body.style.overflow = 'hidden';
+  //     });
+  // });
+  // закрытие попапа
+
+  closeCloseBtn.addEventListener('click', toogleModal); // closeCloseBtn.addEventListener('click', () => {
+  //     // modal.classList.add('hide');
+  //     // modal.classList.remove('show');
+  //     modal.classList.toggle('show');
+  //     document.body.style.overflow = '';
+  // });
+  // закрытие при клике вне области модального окна
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal) {
+      // modal.classList.toggle('show');
+      // document.body.style.overflow = '';
+      toogleModal();
+    }
+  }); // закрытие при нажатии Escape
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Escape' && modal.classList.contains('show')) {
+      toogleModal();
+    }
+  });
 });
 
 /***/ })

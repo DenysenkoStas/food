@@ -56,12 +56,14 @@ a {
     font-weight: 400;
 }
 
-.show {
-    display: block;
-}
-
-.hide {
-    display: none;
+body {
+    .show {
+        display: block;
+    }
+    
+    .hide {
+        display: none;
+    }
 }
 
 .fade {
@@ -72,4 +74,8 @@ a {
 @keyframes fade {
     from {opacity: 0.1;}
     to {opacity: 1;}
+}
+
+.overflow-hidden {
+    overflow: hidden;
 }
