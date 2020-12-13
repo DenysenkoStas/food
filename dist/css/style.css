@@ -63,9 +63,6 @@ body .hide {
   to {
     opacity: 1; } }
 
-.overflow-hidden {
-  overflow: hidden; }
-
 .header {
   display: flex;
   justify-content: space-between;
