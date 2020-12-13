@@ -105,48 +105,51 @@ window.addEventListener('DOMContentLoaded', () => {
           modal = document.querySelector('.modal'),
           closeCloseBtn = modal.querySelector('[data-close]');
 
-    function toogleModal() {
-        modal.classList.toggle('show');
-        document.body.toggle('overflow-hidden');
+    // открытие попапа
+    function openModal() {
+        modal.classList.add('show');
+        modal.classList.remove('hide');
+        document.body.style.overflow = 'hidden';
+        clearInterval(modalTimeId); // отключение автооткрытия попапа
     } 
 
-    // открытие попапа
     modalTrigger.forEach(btn => {
-        btn.addEventListener('click', toogleModal);
+        btn.addEventListener('click', openModal);
     });
 
-    // modalTrigger.forEach(btn => {
-    //     btn.addEventListener('click', () => {
-    //         // modal.classList.add('show');
-    //         // modal.classList.remove('hide');
-    //         modal.classList.toggle('show');
-    //         document.body.style.overflow = 'hidden';
-    //     });
-    // });
-
     // закрытие попапа
-    closeCloseBtn.addEventListener('click', toogleModal);
+    function closeModal() {
+        modal.classList.add('hide');
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    } 
 
-    // closeCloseBtn.addEventListener('click', () => {
-    //     // modal.classList.add('hide');
-    //     // modal.classList.remove('show');
-    //     modal.classList.toggle('show');
-    //     document.body.style.overflow = '';
-    // });
+    closeCloseBtn.addEventListener('click', closeModal);
 
     // закрытие при клике вне области модального окна
     modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-            // modal.classList.toggle('show');
-            // document.body.style.overflow = '';
-            toogleModal();
+            closeModal();
         }
     });
 
     // закрытие при нажатии Escape
     document.addEventListener('keydown', (e) => {
         if(e.code === 'Escape' && modal.classList.contains('show')) {
-            toogleModal();
+            closeModal();
         }
     });
+
+    // автоотркытие попапа при загрузке страницы
+    const modalTimeId = setTimeout(openModal, 5000);
+
+    // открытие попапа при скролле до конца страницы
+    function showModalByScroll() {
+        if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
+            openModal();
+            window.removeEventListener('scroll', showModalByScroll);
+        }
+    }
+
+    window.addEventListener('scroll', showModalByScroll);
 });
