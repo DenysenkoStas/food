@@ -277,10 +277,54 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
   }
+  /* Получение карточек (menu__item) */
 
-  new MenuCard('img/tabs/vegy.jpg', 'vegy', 'Меню "Фитнес"', 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 9, '.menu .container').render();
-  new MenuCard('img/tabs/elite.jpg', 'elite', 'Меню “Премиум”', 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', 14, '.menu .container', 'menu__item', 'big').render();
-  new MenuCard('img/tabs/post.jpg', 'post', 'Меню "Постное"', 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', 21, '.menu .container', 'menu__item').render();
+
+  const getResource = async url => {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      // проверка, если приходит ошибка
+      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
+    }
+
+    return await res.json();
+  };
+  /* Отрисовка карточек (menu__item) */
+
+
+  getResource('http://localhost:3000/menu').then(data => {
+    data.forEach(({
+      img,
+      altimg,
+      title,
+      descr,
+      price
+    }) => {
+      new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+    });
+  });
+  /* Отрисовка карточек (menu__item) - альтернативный вариант */
+  // getResource('http://localhost:3000/menu')
+  //     .then(data => createCard(data));
+  //     function createCard(data) {
+  //         data.forEach(({img, altimg, title, descr, price}) => {
+  //             const element = document.createElement('div');
+  //             element.classList.add('menu__item');
+  //             element.innerHTML = `
+  //                 <img src=${img} alt=${altimg}>
+  //                 <h3 class="menu__item-subtitle">${title}</h3>
+  //                 <div class="menu__item-descr">${descr}</div>
+  //                 <div class="menu__item-divider"></div>
+  //                 <div class="menu__item-price">
+  //                     <div class="menu__item-cost">Цена:</div>
+  //                     <div class="menu__item-total"><span>${price * 27}</span> грн/день</div>
+  //                 </div>
+  //             `;
+  //             document.querySelector('.menu .container').append(element);
+  //         });
+  //     }
+
   /* Отправка данных форм */
 
   const forms = document.querySelectorAll('form');
@@ -290,10 +334,21 @@ window.addEventListener('DOMContentLoaded', () => {
     failure: 'Что-то пошло не так...'
   };
   forms.forEach(item => {
-    postData(item);
-  });
+    bindPostData(item);
+  }); // ф-я настройки запроса
 
-  function postData(form) {
+  const postData = async (url, data) => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: data
+    });
+    return await res.json(); // трансформация ответа в json
+  };
+
+  function bindPostData(form) {
     form.addEventListener('submit', e => {
       e.preventDefault();
       const statusMessage = document.createElement('img');
@@ -307,15 +362,12 @@ window.addEventListener('DOMContentLoaded', () => {
       const object = {};
       formData.forEach(function (value, key) {
         object[key] = value;
-      }); // отправка формы с использованием fetch
+      }); // закомментировал из-за ошибки Cannot find module 'core-js/modules/web.dom-collections.iterator'
+      // const json = JSON.stringify(Object.fromEntries(formData.entries())); // превращение входящих данных
+      // отправка формы с использованием fetch
 
-      fetch('server.php', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify(object)
-      }).then(data => data.text()).then(data => {
+      postData('http://localhost:3000/requests', JSON.stringify(object)) // вызов postData
+      .then(data => {
         console.log(data);
         showThanksModal(message.success);
         form.reset(); // оставил здесь из-за ошибки Cannot find module 'core-js/modules/es.promise.finally'
