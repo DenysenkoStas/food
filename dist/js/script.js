@@ -291,10 +291,18 @@ window.addEventListener('DOMContentLoaded', () => {
     return await res.json();
   };
   /* Отрисовка карточек (menu__item) */
+  // getResource('http://localhost:3000/menu')
+  //     .then(data => {
+  //         data.forEach(({img, altimg, title, descr, price}) => {
+  //             new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+  //         });
+  //     });
+
+  /* Отрисовка карточек (menu__item) с использованием б-ки axios */
 
 
-  getResource('http://localhost:3000/menu').then(data => {
-    data.forEach(({
+  axios.get('http://localhost:3000/menu').then(data => {
+    data.data.forEach(({
       img,
       altimg,
       title,
@@ -404,9 +412,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 4000);
   }
   /* Получение данных с db.json с помощью json-server */
+  // fetch('http://localhost:3000/menu')
+  //     .then(data => data.json())
+  //     .then(res => console.log(res));
 
-
-  fetch('http://localhost:3000/menu').then(data => data.json()).then(res => console.log(res));
 });
 
 /***/ })
