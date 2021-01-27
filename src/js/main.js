@@ -335,8 +335,52 @@ window.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    /* Получение данных с db.json с помощью json-server */
-    // fetch('http://localhost:3000/menu')
-    //     .then(data => data.json())
-    //     .then(res => console.log(res));
+    /* Slider */
+    const slides = document.querySelectorAll('.offer__slide'),
+          prev = document.querySelector('.offer__slider-prev'),
+          next = document.querySelector('.offer__slider-next'),
+          total = document.querySelector('#total'),
+          current = document.querySelector('#current');
+    let slideIndex = 1;
+
+    showSlides(slideIndex); // инициализация слайдера
+    // проверка на добавление 0 и отображение кооличества слайдов
+    if (slides.length < 10) {
+        total.textContent = `0${slides.length}`;
+    } else {
+        total.textContent = slides.length;
+    }
+
+    function showSlides(n) {
+        // если последний слайд, то возвращать к первому
+        if (n > slides.length) {
+            slideIndex = 1;
+        }
+        // если первый - к последнему
+        if (n < 1) {
+            slideIndex = slides.length;
+        }
+        
+        slides.forEach(item => item.style.display = 'none'); // скрытие слайдов
+
+        slides[slideIndex - 1].style.display = 'block'; // отображение первого
+        // отображение номера текущего слайда
+        if (slides.length < 10) {
+            current.textContent = `0${slideIndex}`;
+        } else {
+            current.textContent = slideIndex;
+        }
+    }
+    // переключение слайдов
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+    // переключение назад
+    prev.addEventListener('click', () => {
+        plusSlides(-1);
+    });
+    // переключение вперед
+    next.addEventListener('click', () => {
+        plusSlides(1);
+    });
 });
