@@ -91,150 +91,173 @@
   !*** ./src/js/main.js ***!
   \************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 window.addEventListener('DOMContentLoaded', () => {
-  /* Tabs/Slider */
-  const tabs = document.querySelectorAll('.tabheader__item'),
-        tabsContent = document.querySelectorAll('.tabcontent'),
-        tabsParent = document.querySelector('.tabheader__items');
+  const tabs = __webpack_require__(/*! ./modules/tabs */ "./src/js/modules/tabs.js"),
+        timer = __webpack_require__(/*! ./modules/timer */ "./src/js/modules/timer.js"),
+        modal = __webpack_require__(/*! ./modules/modal */ "./src/js/modules/modal.js"),
+        cards = __webpack_require__(/*! ./modules/cards */ "./src/js/modules/cards.js"),
+        forms = __webpack_require__(/*! ./modules/forms */ "./src/js/modules/forms.js"),
+        slider = __webpack_require__(/*! ./modules/slider */ "./src/js/modules/slider.js"),
+        calc = __webpack_require__(/*! ./modules/calc */ "./src/js/modules/calc.js");
 
-  function hideTabContent() {
-    // скрытие .tabcontent
-    tabsContent.forEach(item => {
-      // item.style.display = 'none';
-      item.classList.add('hide');
-      item.classList.remove('show', 'fade');
-    }); // удаление класса у .tabheader__item
+  tabs();
+  timer();
+  modal();
+  cards();
+  forms();
+  slider();
+  calc();
+});
 
-    tabs.forEach(item => {
-      item.classList.remove('tabheader__item_active');
-    });
-  } // отображение .tabcontent и добавление класса у .tabheader__item
+/***/ }),
 
+/***/ "./src/js/modules/calc.js":
+/*!********************************!*\
+  !*** ./src/js/modules/calc.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
 
-  function showTabContent(i = 0) {
-    // tabsContent[i].style.display = 'block';
-    tabsContent[i].classList.add('show', 'fade');
-    tabsContent[i].classList.remove('hide');
-    tabs[i].classList.add('tabheader__item_active');
-  }
+function calc() {
+  /* Calculator */
+  const result = document.querySelector('.calculating__result span');
+  let sex, height, weight, age, ratio; // сохранение пола в localStorage
 
-  hideTabContent();
-  showTabContent(); // переключение табов
-
-  tabsParent.addEventListener('click', event => {
-    const target = event.target;
-
-    if (target && target.classList.contains('tabheader__item')) {
-      tabs.forEach((item, i) => {
-        if (target == item) {
-          hideTabContent();
-          showTabContent(i);
-        }
-      });
-    }
-  });
-  /* Timer */
-
-  const deadline = '2020-12-11'; // расчет временных промежутков
-
-  function getTimeRemaining(endtime) {
-    const t = Date.parse(endtime) - Date.parse(new Date()),
-          days = Math.floor(t / (1000 * 60 * 60 * 24)),
-          hours = Math.floor(t / (1000 * 60 * 60) % 24),
-          minutes = Math.floor(t / 1000 / 60 % 60),
-          seconds = Math.floor(t / 1000 % 60);
-    return {
-      'total': t,
-      'days': days,
-      'hours': hours,
-      'minutes': minutes,
-      'seconds': seconds
-    };
-  } // добавление ноля если время меньше 10-ти
+  if (localStorage.getItem('sex')) {
+    sex = localStorage.getItem('sex');
+  } else {
+    sex = 'female';
+    localStorage.setItem('sex', 'female');
+  } // сохранение активности в localStorage
 
 
-  function getZero(num) {
-    if (num >= 0 && num < 10) {
-      return `0${num}`;
-    } else {
-      return num;
-    }
-  } // установление часов/таймера на страницу
+  if (localStorage.getItem('ratio')) {
+    ratio = localStorage.getItem('ratio');
+  } else {
+    ratio = 1.375;
+    localStorage.setItem('ratio', 1.375);
+  } // добавление классов из localStorage для кнопок пола и активности
 
 
-  function setClock(selector, endtime) {
-    const timer = document.querySelector(selector),
-          days = timer.querySelector('#days'),
-          hours = timer.querySelector('#hours'),
-          minutes = timer.querySelector('#minutes'),
-          seconds = timer.querySelector('#seconds'),
-          timeInterval = setInterval(updateClock, 1000);
-    updateClock(); // убирание мигания у верстке
-    // обновление часов
+  function initLocalSettings(selector, activeClass) {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(elem => {
+      elem.classList.remove(activeClass);
 
-    function updateClock() {
-      const t = getTimeRemaining(endtime);
-      days.innerHTML = getZero(t.days);
-      hours.innerHTML = getZero(t.hours);
-      minutes.innerHTML = getZero(t.minutes);
-      seconds.innerHTML = getZero(t.seconds);
-
-      if (t.total <= 0) {
-        clearInterval(timeInterval);
+      if (elem.getAttribute('id') === localStorage.getItem('sex')) {
+        elem.classList.add(activeClass);
       }
+
+      if (elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
+        elem.classList.add(activeClass);
+      }
+    });
+  }
+
+  initLocalSettings('#gender div', 'calculating__choose-item_active'); // вызов ф-и для пола
+
+  initLocalSettings('.calculating__choose_big div', 'calculating__choose-item_active'); // вызов ф-и для активности
+  // подсчет общего результата
+
+  function calcTotal() {
+    if (!sex || !height || !weight || !age || !ratio) {
+      result.textContent = '____';
+      return;
+    }
+
+    if (sex === 'female') {
+      result.textContent = Math.round((447.6 + 9.2 * weight + 3.1 * height - 4.3 * age) * ratio);
+    } else {
+      result.textContent = Math.round((88.36 + 13.4 * weight + 4.8 * height - 5.7 * age) * ratio);
     }
   }
 
-  setClock('.timer', deadline);
-  /* Modal */
+  calcTotal(); // получение информации и смена классов
 
-  const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal'); // открытие попапа
+  function getStaticInformation(selector, activeClass) {
+    const elements = document.querySelectorAll(selector);
+    elements.forEach(elem => {
+      elem.addEventListener('click', e => {
+        // проверка при клике на активность или пол
+        if (e.target.getAttribute('data-ratio')) {
+          ratio = +e.target.getAttribute('data-ratio'); // получение data-атрибута
 
-  function openModal() {
-    modal.classList.add('show');
-    modal.classList.remove('hide');
-    document.body.style.overflow = 'hidden';
-    clearInterval(modalTimeId); // отключение автооткрытия попапа
+          localStorage.setItem('ratio', +e.target.getAttribute('data-ratio')); // сохранение активности в localStorage
+        } else {
+          sex = e.target.getAttribute('id'); // получение id-пола
+
+          localStorage.setItem('sex', e.target.getAttribute('id')); // сохранение пола в localStorage
+        } // удаление активного класса 
+
+
+        elements.forEach(elem => {
+          elem.classList.remove(activeClass);
+        });
+        e.target.classList.add(activeClass); // добавление активного класса
+
+        calcTotal(); // перерасчет при каждом выборе
+      });
+    });
   }
 
-  modalTrigger.forEach(btn => {
-    btn.addEventListener('click', openModal);
-  }); // закрытие попапа
+  getStaticInformation('#gender div', 'calculating__choose-item_active'); // вызов ф-и для пола
 
-  function closeModal() {
-    modal.classList.add('hide');
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-  } // закрытие при клике вне области модального окна
+  getStaticInformation('.calculating__choose_big div', 'calculating__choose-item_active'); // вызов ф-и для активности
+  // получение информации с инпутов
+
+  function getDynamicInformation(selector) {
+    const input = document.querySelector(selector);
+    input.addEventListener('input', () => {
+      // проверка, если введено не число
+      if (input.value.match(/\D/g)) {
+        input.style.border = '1px solid red';
+      } else {
+        input.style.border = 'none';
+      } // проверка на выбранный инпут
 
 
-  modal.addEventListener('click', e => {
-    if (e.target === modal || e.target.getAttribute('data-close') == '') {
-      closeModal();
-    }
-  }); // закрытие при нажатии Escape
+      switch (input.getAttribute('id')) {
+        case 'height':
+          height = +input.value;
+          break;
 
-  document.addEventListener('keydown', e => {
-    if (e.code === 'Escape' && modal.classList.contains('show')) {
-      closeModal();
-    }
-  }); // автоотркытие попапа при загрузке страницы
+        case 'weight':
+          weight = +input.value;
+          break;
 
-  const modalTimeId = setTimeout(openModal, 50000); // открытие попапа при скролле до конца страницы
+        case 'age':
+          age = +input.value;
+          break;
+      }
 
-  function showModalByScroll() {
-    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
-      openModal();
-      window.removeEventListener('scroll', showModalByScroll);
-    }
+      calcTotal(); // перерасчет при каждом вводе
+    });
   }
 
-  window.addEventListener('scroll', showModalByScroll);
+  getDynamicInformation('#height'); // вызов ф-и для роста
+
+  getDynamicInformation('#weight'); // вызов ф-и для веса
+
+  getDynamicInformation('#age'); // вызов ф-и для возраста
+}
+
+module.exports = calc;
+
+/***/ }),
+
+/***/ "./src/js/modules/cards.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/cards.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function cards() {
+  /* Cards */
+
   /* Используем классы для карточек */
-
   class MenuCard {
     constructor(src, alt, title, descr, price, parentSelector, ...classes) {
       this.src = src;
@@ -332,9 +355,23 @@ window.addEventListener('DOMContentLoaded', () => {
   //             document.querySelector('.menu .container').append(element);
   //         });
   //     }
+}
+
+module.exports = cards;
+
+/***/ }),
+
+/***/ "./src/js/modules/forms.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/forms.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function forms() {
+  /* Forms */
 
   /* Отправка данных форм */
-
   const forms = document.querySelectorAll('form');
   const message = {
     loading: 'img/form/spinner.svg',
@@ -362,9 +399,9 @@ window.addEventListener('DOMContentLoaded', () => {
       const statusMessage = document.createElement('img');
       statusMessage.src = message.loading;
       statusMessage.style.cssText = `
-                display: block;
-                margin: 0 auto;
-            `;
+            display: block;
+            margin: 0 auto;
+        `;
       form.insertAdjacentElement('afterend', statusMessage);
       const formData = new FormData(form);
       const object = {};
@@ -398,11 +435,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const thanksModal = document.createElement('div');
     thanksModal.classList.add('modal__dialog');
     thanksModal.innerHTML = `
-            <div class="modal__content">
-                <div class="modal__close" data-close>×</div>
-                <div class="modal__title">${message}</div>
-            </div>
-        `;
+        <div class="modal__content">
+            <div class="modal__close" data-close>×</div>
+            <div class="modal__title">${message}</div>
+        </div>
+    `;
     document.querySelector('.modal').append(thanksModal);
     setTimeout(() => {
       thanksModal.remove();
@@ -411,9 +448,79 @@ window.addEventListener('DOMContentLoaded', () => {
       closeModal();
     }, 4000);
   }
+}
+
+module.exports = forms;
+
+/***/ }),
+
+/***/ "./src/js/modules/modal.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/modal.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function modal() {
+  /* Modal */
+  const modalTrigger = document.querySelectorAll('[data-modal]'),
+        modal = document.querySelector('.modal'); // открытие попапа
+
+  function openModal() {
+    modal.classList.add('show');
+    modal.classList.remove('hide');
+    document.body.style.overflow = 'hidden';
+    clearInterval(modalTimeId); // отключение автооткрытия попапа
+  }
+
+  modalTrigger.forEach(btn => {
+    btn.addEventListener('click', openModal);
+  }); // закрытие попапа
+
+  function closeModal() {
+    modal.classList.add('hide');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+  } // закрытие при клике вне области модального окна
+
+
+  modal.addEventListener('click', e => {
+    if (e.target === modal || e.target.getAttribute('data-close') == '') {
+      closeModal();
+    }
+  }); // закрытие при нажатии Escape
+
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Escape' && modal.classList.contains('show')) {
+      closeModal();
+    }
+  }); // автоотркытие попапа при загрузке страницы
+
+  const modalTimeId = setTimeout(openModal, 50000); // открытие попапа при скролле до конца страницы
+
+  function showModalByScroll() {
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
+      openModal();
+      window.removeEventListener('scroll', showModalByScroll);
+    }
+  }
+
+  window.addEventListener('scroll', showModalByScroll);
+}
+
+module.exports = modal;
+
+/***/ }),
+
+/***/ "./src/js/modules/slider.js":
+/*!**********************************!*\
+  !*** ./src/js/modules/slider.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function slider() {
   /* Slider */
-
-
   const slides = document.querySelectorAll('.offer__slide'),
         slider = document.querySelector('.offer__slider'),
         // для реализации точек
@@ -454,37 +561,37 @@ window.addEventListener('DOMContentLoaded', () => {
         dots = [];
   indicators.classList.add('carousel-indicators');
   indicators.style.cssText = `
-        position: absolute;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 15;
-        display: flex;
-        justify-content: center;
-        margin-right: 15%;
-        margin-left: 15%;
-        list-style: none;
-    `;
+position: absolute;
+right: 0;
+bottom: 0;
+left: 0;
+z-index: 15;
+display: flex;
+justify-content: center;
+margin-right: 15%;
+margin-left: 15%;
+list-style: none;
+`;
   slider.append(indicators); // создание точек
 
   for (let i = 0; i < slides.length; i++) {
     const dot = document.createElement('li');
     dot.setAttribute('data-slide-to', i + 1);
     dot.style.cssText = `
-            box-sizing: content-box;
-            flex: 0 1 auto;
-            width: 30px;
-            height: 6px;
-            margin-right: 3px;
-            margin-left: 3px;
-            cursor: pointer;
-            background-color: #fff;
-            background-clip: padding-box;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-            opacity: .5;
-            transition: opacity .6s ease;
-        `;
+  box-sizing: content-box;
+  flex: 0 1 auto;
+  width: 30px;
+  height: 6px;
+  margin-right: 3px;
+  margin-left: 3px;
+  cursor: pointer;
+  background-color: #fff;
+  background-clip: padding-box;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  opacity: .5;
+  transition: opacity .6s ease;
+`;
 
     if (i == 0) {
       dot.style.opacity = 1;
@@ -607,129 +714,130 @@ window.addEventListener('DOMContentLoaded', () => {
   // next.addEventListener('click', () => {
   //     plusSlides(1);
   // });
+}
 
-  /* Calculator */
+module.exports = slider;
 
-  const result = document.querySelector('.calculating__result span');
-  let sex, height, weight, age, ratio; // сохранение пола в localStorage
+/***/ }),
 
-  if (localStorage.getItem('sex')) {
-    sex = localStorage.getItem('sex');
-  } else {
-    sex = 'female';
-    localStorage.setItem('sex', 'female');
-  } // сохранение активности в localStorage
+/***/ "./src/js/modules/tabs.js":
+/*!********************************!*\
+  !*** ./src/js/modules/tabs.js ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
 
+function tabs() {
+  /* Tabs/Slider */
+  const tabs = document.querySelectorAll('.tabheader__item'),
+        tabsContent = document.querySelectorAll('.tabcontent'),
+        tabsParent = document.querySelector('.tabheader__items');
 
-  if (localStorage.getItem('ratio')) {
-    ratio = localStorage.getItem('ratio');
-  } else {
-    ratio = 1.375;
-    localStorage.setItem('ratio', 1.375);
-  } // добавление классов из localStorage для кнопок пола и активности
+  function hideTabContent() {
+    // скрытие .tabcontent
+    tabsContent.forEach(item => {
+      // item.style.display = 'none';
+      item.classList.add('hide');
+      item.classList.remove('show', 'fade');
+    }); // удаление класса у .tabheader__item
 
-
-  function initLocalSettings(selector, activeClass) {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach(elem => {
-      elem.classList.remove(activeClass);
-
-      if (elem.getAttribute('id') === localStorage.getItem('sex')) {
-        elem.classList.add(activeClass);
-      }
-
-      if (elem.getAttribute('data-ratio') === localStorage.getItem('ratio')) {
-        elem.classList.add(activeClass);
-      }
+    tabs.forEach(item => {
+      item.classList.remove('tabheader__item_active');
     });
+  } // отображение .tabcontent и добавление класса у .tabheader__item
+
+
+  function showTabContent(i = 0) {
+    // tabsContent[i].style.display = 'block';
+    tabsContent[i].classList.add('show', 'fade');
+    tabsContent[i].classList.remove('hide');
+    tabs[i].classList.add('tabheader__item_active');
   }
 
-  initLocalSettings('#gender div', 'calculating__choose-item_active'); // вызов ф-и для пола
+  hideTabContent();
+  showTabContent(); // переключение табов
 
-  initLocalSettings('.calculating__choose_big div', 'calculating__choose-item_active'); // вызов ф-и для активности
-  // подсчет общего результата
+  tabsParent.addEventListener('click', event => {
+    const target = event.target;
 
-  function calcTotal() {
-    if (!sex || !height || !weight || !age || !ratio) {
-      result.textContent = '____';
-      return;
-    }
-
-    if (sex === 'female') {
-      result.textContent = Math.round((447.6 + 9.2 * weight + 3.1 * height - 4.3 * age) * ratio);
-    } else {
-      result.textContent = Math.round((88.36 + 13.4 * weight + 4.8 * height - 5.7 * age) * ratio);
-    }
-  }
-
-  calcTotal(); // получение информации и смена классов
-
-  function getStaticInformation(selector, activeClass) {
-    const elements = document.querySelectorAll(selector);
-    elements.forEach(elem => {
-      elem.addEventListener('click', e => {
-        // проверка при клике на активность или пол
-        if (e.target.getAttribute('data-ratio')) {
-          ratio = +e.target.getAttribute('data-ratio'); // получение data-атрибута
-
-          localStorage.setItem('ratio', +e.target.getAttribute('data-ratio')); // сохранение активности в localStorage
-        } else {
-          sex = e.target.getAttribute('id'); // получение id-пола
-
-          localStorage.setItem('sex', e.target.getAttribute('id')); // сохранение пола в localStorage
-        } // удаление активного класса 
-
-
-        elements.forEach(elem => {
-          elem.classList.remove(activeClass);
-        });
-        e.target.classList.add(activeClass); // добавление активного класса
-
-        calcTotal(); // перерасчет при каждом выборе
+    if (target && target.classList.contains('tabheader__item')) {
+      tabs.forEach((item, i) => {
+        if (target == item) {
+          hideTabContent();
+          showTabContent(i);
+        }
       });
-    });
-  }
+    }
+  });
+}
 
-  getStaticInformation('#gender div', 'calculating__choose-item_active'); // вызов ф-и для пола
+module.exports = tabs;
 
-  getStaticInformation('.calculating__choose_big div', 'calculating__choose-item_active'); // вызов ф-и для активности
-  // получение информации с инпутов
+/***/ }),
 
-  function getDynamicInformation(selector) {
-    const input = document.querySelector(selector);
-    input.addEventListener('input', () => {
-      // проверка, если введено не число
-      if (input.value.match(/\D/g)) {
-        input.style.border = '1px solid red';
-      } else {
-        input.style.border = 'none';
-      } // проверка на выбранный инпут
+/***/ "./src/js/modules/timer.js":
+/*!*********************************!*\
+  !*** ./src/js/modules/timer.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+function timer() {
+  /* Timer */
+  const deadline = '2021-05-11'; // расчет временных промежутков
+
+  function getTimeRemaining(endtime) {
+    const t = Date.parse(endtime) - Date.parse(new Date()),
+          days = Math.floor(t / (1000 * 60 * 60 * 24)),
+          hours = Math.floor(t / (1000 * 60 * 60) % 24),
+          minutes = Math.floor(t / 1000 / 60 % 60),
+          seconds = Math.floor(t / 1000 % 60);
+    return {
+      'total': t,
+      'days': days,
+      'hours': hours,
+      'minutes': minutes,
+      'seconds': seconds
+    };
+  } // добавление ноля если время меньше 10-ти
 
 
-      switch (input.getAttribute('id')) {
-        case 'height':
-          height = +input.value;
-          break;
+  function getZero(num) {
+    if (num >= 0 && num < 10) {
+      return `0${num}`;
+    } else {
+      return num;
+    }
+  } // установление часов/таймера на страницу
 
-        case 'weight':
-          weight = +input.value;
-          break;
 
-        case 'age':
-          age = +input.value;
-          break;
+  function setClock(selector, endtime) {
+    const timer = document.querySelector(selector),
+          days = timer.querySelector('#days'),
+          hours = timer.querySelector('#hours'),
+          minutes = timer.querySelector('#minutes'),
+          seconds = timer.querySelector('#seconds'),
+          timeInterval = setInterval(updateClock, 1000);
+    updateClock(); // убирание мигания у верстке
+    // обновление часов
+
+    function updateClock() {
+      const t = getTimeRemaining(endtime);
+      days.innerHTML = getZero(t.days);
+      hours.innerHTML = getZero(t.hours);
+      minutes.innerHTML = getZero(t.minutes);
+      seconds.innerHTML = getZero(t.seconds);
+
+      if (t.total <= 0) {
+        clearInterval(timeInterval);
       }
-
-      calcTotal(); // перерасчет при каждом вводе
-    });
+    }
   }
 
-  getDynamicInformation('#height'); // вызов ф-и для роста
+  setClock('.timer', deadline);
+}
 
-  getDynamicInformation('#weight'); // вызов ф-и для веса
-
-  getDynamicInformation('#age'); // вызов ф-и для возраста
-});
+module.exports = timer;
 
 /***/ })
 
