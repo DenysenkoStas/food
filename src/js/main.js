@@ -534,4 +534,80 @@ window.addEventListener('DOMContentLoaded', () => {
     // next.addEventListener('click', () => {
     //     plusSlides(1);
     // });
+
+    /* Calculator */
+    const result = document.querySelector('.calculating__result span');
+    let sex = 'female', 
+        height, weight, age, 
+        ratio = '1.375';
+
+    // подсчет общего результата
+    function calcTotal() {
+        if (!sex || !height || !weight || !age || !ratio) {
+            result.textContent = '____';
+            return;
+        }
+
+        if (sex === 'female') {
+            result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+        } else {
+            result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+        }
+    }
+
+    calcTotal();
+
+    // получение информации и смена классов
+    function getStaticInformation(parentSelector, activeClass) {
+        const elements = document.querySelectorAll(`${parentSelector} div`);
+
+        elements.forEach(elem => {
+            elem.addEventListener('click', (e) => {
+                // проверка при клике на активность или пол
+                if (e.target.getAttribute('data-ratio')) {
+                    ratio = +e.target.getAttribute('data-ratio'); // получение data-атрибута
+                } else {
+                    sex = e.target.getAttribute('id'); // получение id-пола
+                }
+    
+                // удаление активного класса 
+                elements.forEach(elem => {
+                    elem.classList.remove(activeClass);
+                });
+    
+                e.target.classList.add(activeClass); // добавление активного класса
+    
+                calcTotal(); // перерасчет при каждом выборе
+            });
+        });
+    }
+
+    getStaticInformation('#gender', 'calculating__choose-item_active'); // вызов ф-и для пола
+    getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active'); // вызов ф-и для активности
+
+    // получение информации с инпутов
+    function getDynamicInformation(selector) {
+        const input = document.querySelector(selector);
+
+        input.addEventListener('input', () => {
+            // проверка на выбранный инпут
+            switch(input.getAttribute('id')) {
+                case 'height':
+                    height = +input.value;
+                    break;
+                case 'weight':
+                    weight = +input.value;
+                    break;
+                case 'age':
+                    age = +input.value;
+                    break;
+            }
+
+            calcTotal(); // перерасчет при каждом вводе
+        });
+    }
+
+    getDynamicInformation('#height'); // вызов ф-и для роста
+    getDynamicInformation('#weight'); // вызов ф-и для веса
+    getDynamicInformation('#age'); // вызов ф-и для возраста
 });
