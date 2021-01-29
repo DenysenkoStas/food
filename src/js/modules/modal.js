@@ -1,48 +1,53 @@
-function modal() {
-    /* Modal */
-    const modalTrigger = document.querySelectorAll('[data-modal]'),
-        modal = document.querySelector('.modal');
+// открытие попапа
+function openModal(modalSelector, modalTimerId) {
+    const modal = document.querySelector(modalSelector);
 
-    // открытие попапа
-    function openModal() {
-        modal.classList.add('show');
-        modal.classList.remove('hide');
-        document.body.style.overflow = 'hidden';
-        clearInterval(modalTimeId); // отключение автооткрытия попапа
+    modal.classList.add('show');
+    modal.classList.remove('hide');
+    document.body.style.overflow = 'hidden';
+
+    // console.log(modalTimerId);
+    if (modalTimerId) {
+        clearInterval(modalTimerId); // отключение автооткрытия попапа
     }
+}
+
+// закрытие попапа
+function closeModal(modalSelector) {
+    const modal = document.querySelector(modalSelector);
+
+    modal.classList.add('hide');
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+function modal(trigerSelector, modalSelector, modalTimerId) {
+    /* Modal */
+    const modalTrigger = document.querySelectorAll(trigerSelector),
+        modal = document.querySelector(modalSelector);
 
     modalTrigger.forEach(btn => {
-        btn.addEventListener('click', openModal);
+        btn.addEventListener('click', () => openModal(modalSelector, modalTimerId));
     });
-
-    // закрытие попапа
-    function closeModal() {
-        modal.classList.add('hide');
-        modal.classList.remove('show');
-        document.body.style.overflow = '';
-    }
 
     // закрытие при клике вне области модального окна
     modal.addEventListener('click', (e) => {
         if (e.target === modal || e.target.getAttribute('data-close') == '') {
-            closeModal();
+            closeModal(modalSelector);
         }
     });
 
     // закрытие при нажатии Escape
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Escape' && modal.classList.contains('show')) {
-            closeModal();
+            closeModal(modalSelector);
         }
     });
-
-    // автоотркытие попапа при загрузке страницы
-    const modalTimeId = setTimeout(openModal, 50000);
 
     // открытие попапа при скролле до конца страницы
     function showModalByScroll() {
         if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight - 1) {
-            openModal();
+            openModal(modalSelector, modalTimerId);
             window.removeEventListener('scroll', showModalByScroll);
         }
     }
@@ -50,4 +55,5 @@ function modal() {
     window.addEventListener('scroll', showModalByScroll);
 }
 
-module.exports = modal;
+export default modal;
+export {closeModal, openModal};

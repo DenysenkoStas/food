@@ -118,4 +118,4 @@ function calc() {
     getDynamicInformation('#age'); // вызов ф-и для возраста
 }
 
-module.exports = calc;
+export default calc; // экспорт по стандартам ES6

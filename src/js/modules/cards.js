@@ -1,3 +1,5 @@
+import {getResource} from '../services/services';
+
 function cards() {
     /* Cards */
     /* Используем классы для карточек */
@@ -41,17 +43,6 @@ function cards() {
             this.parent.append(element);
         }
     }
-
-    /* Получение карточек (menu__item) */
-    const getResource = async (url) => {
-        const res = await fetch(url);
-
-        if (!res.ok) { // проверка, если приходит ошибка
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-        }
-
-        return await res.json();
-    };
 
     /* Отрисовка карточек (menu__item) */
     // getResource('http://localhost:3000/menu')
@@ -101,4 +92,4 @@ function cards() {
     //     }
 }
 
-module.exports = cards;
+export default cards;
